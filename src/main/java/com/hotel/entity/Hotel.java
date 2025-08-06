@@ -27,7 +27,15 @@ public class Hotel {
     private int rating;
     private Long reviews;
 
-    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "hotel" , cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @Builder.Default
     private List<Room> rooms = new ArrayList<>();
+
+    public void addRoom(Room room) {
+        rooms.add(room);
+    }
+
+    public void removeRoom(Room room) {
+        rooms.remove(room);
+    }
 }
