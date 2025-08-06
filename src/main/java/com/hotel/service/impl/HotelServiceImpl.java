@@ -7,6 +7,7 @@ import com.hotel.service.HotelService;
 import com.hotel.utils.BeanUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -28,11 +29,13 @@ public class HotelServiceImpl implements HotelService {
     }
 
     @Override
+    @Transactional
     public Hotel save(Hotel hotel) {
         return repository.save(hotel);
     }
 
     @Override
+    @Transactional
     public Hotel update(Hotel hotel) {
         Hotel exists = findById(hotel.getId());
         BeanUtils.copyNonNullProperties(hotel, exists);
@@ -40,6 +43,7 @@ public class HotelServiceImpl implements HotelService {
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
         repository.deleteById(id);
     }
