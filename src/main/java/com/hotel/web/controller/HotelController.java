@@ -28,7 +28,7 @@ public class HotelController {
         return mapper.hotelToResponse(service.findById(id));
     }
 
-    @PostMapping("/create")
+    @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     public HotelResponse createHotel(@RequestBody HotelRequest hotelRequest) {
         Hotel hotel = service.save(mapper.requestToHotel(hotelRequest));
