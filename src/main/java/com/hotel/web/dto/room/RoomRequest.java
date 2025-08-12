@@ -1,5 +1,6 @@
 package com.hotel.web.dto.room;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,6 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RoomRequest {
+
+    @NotNull(message = "Cannot create a room without hotel")
     private Long hotelId;
 
     private String name;
