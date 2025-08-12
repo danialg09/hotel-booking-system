@@ -7,6 +7,7 @@ import com.hotel.web.dto.room.RoomRequest;
 import com.hotel.web.dto.room.RoomResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,18 +19,21 @@ public class RoomController {
     private final RoomMapper mapper;
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public RoomResponse findById(@PathVariable Long id) {
         return mapper.roomToResponse(service.findById(id));
     }
 
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ADMIN')")
     public RoomResponse save(@RequestBody RoomRequest roomRequest) {
         Room updated = service.save(mapper.requestToRoom(roomRequest));
         return mapper.roomToResponse(updated);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public RoomResponse update(@PathVariable Long id, @RequestBody RoomRequest roomRequest) {
         Room updated = service.update(mapper.requestToRoom(id, roomRequest));
         return mapper.roomToResponse(updated);
@@ -37,6 +41,7 @@ public class RoomController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMIN')")
     public void delete(@PathVariable Long id) {
         service.delete(id);
     }
