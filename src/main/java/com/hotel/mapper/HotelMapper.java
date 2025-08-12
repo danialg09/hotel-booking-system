@@ -4,6 +4,7 @@ import com.hotel.entity.Hotel;
 import com.hotel.mapper.deckorator.HotelMapperDecorator;
 import com.hotel.web.dto.hotel.HotelRequest;
 import com.hotel.web.dto.hotel.HotelResponse;
+import com.hotel.web.dto.hotel.HotelShortResponse;
 import com.hotel.web.dto.hotel.ListHotelResponse;
 import org.mapstruct.DecoratedWith;
 import org.mapstruct.Mapper;
@@ -20,6 +21,8 @@ public interface HotelMapper {
     Hotel requestToHotel(Long id, HotelRequest request);
 
     HotelResponse hotelToResponse(Hotel hotel);
+
+    HotelShortResponse hotelToShortResponse(Hotel hotel);
 
     List<HotelResponse> hotelsListToResponseList(List<Hotel> hotels);
 

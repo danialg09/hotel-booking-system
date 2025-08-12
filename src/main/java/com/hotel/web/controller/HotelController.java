@@ -8,6 +8,7 @@ import com.hotel.web.dto.hotel.HotelResponse;
 import com.hotel.web.dto.hotel.ListHotelResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,23 +20,27 @@ public class HotelController {
     private final HotelMapper mapper;
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ListHotelResponse getAllHotels() {
         return mapper.hotelsListToHotelsListResponse(service.findAll());
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public HotelResponse getHotelById(@PathVariable Long id) {
         return mapper.hotelToResponse(service.findById(id));
     }
 
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ADMIN')")
     public HotelResponse createHotel(@RequestBody HotelRequest hotelRequest) {
         Hotel hotel = service.save(mapper.requestToHotel(hotelRequest));
         return mapper.hotelToResponse(hotel);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public HotelResponse updateHotel(@PathVariable Long id, @RequestBody HotelRequest hotelRequest) {
         Hotel updated = service.update(mapper.requestToHotel(id, hotelRequest));
         return mapper.hotelToResponse(updated);
@@ -43,6 +48,7 @@ public class HotelController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteHotel(@PathVariable Long id) {
         service.delete(id);
     }
