@@ -14,5 +14,5 @@ public class HotelResponse {
     private String address;
     private Long distance;
     private int rating;
-    private Long reviews;
+    private int reviews;
 }
