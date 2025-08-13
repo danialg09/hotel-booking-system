@@ -16,7 +16,7 @@ public abstract class HotelMapperDecorator implements HotelMapper {
         hotel.setCity(request.getCity());
         hotel.setAddress(request.getAddress());
         hotel.setDistance(request.getDistance());
-        hotel.setRating(0);
+        hotel.setRating(0.0);
         hotel.setReviews(0);
         return hotel;
     }

@@ -31,7 +31,7 @@ public class ExceptionController {
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(BookingAlreadyExistsException.class)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     public ErrorResponse validationException(MethodArgumentNotValidException e) {
         log.error(e.getLocalizedMessage());
 
