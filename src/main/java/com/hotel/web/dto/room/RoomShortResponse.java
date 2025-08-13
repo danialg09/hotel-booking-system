@@ -15,7 +15,7 @@ public class RoomShortResponse {
 
     private Long price;
 
-    private int capacity;
+    private Integer capacity;
 
     private HotelShortResponse hotel;
 }
