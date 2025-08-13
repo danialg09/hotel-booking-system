@@ -12,7 +12,6 @@ import com.hotel.web.dto.user.UserResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -30,39 +29,45 @@ public class UserController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<UserListResponse> findAll() {
-        return ResponseEntity.ok(mapper.userListToUserListResponse(service.findAll()));
+    public UserListResponse findAll() {
+        return mapper.userListToUserListResponse(service.findAll());
     }
 
     @GetMapping("/profile")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    public ResponseEntity<String> profile(@AuthenticationPrincipal AppUserPrincipal user) {
-        return ResponseEntity.ok(MessageFormat.format("Method called by user: {0}, Role is: {1}", user.getUsername(), user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.joining(","))));
+    public String profile(@AuthenticationPrincipal AppUserPrincipal user) {
+        return MessageFormat.format("Method called by user: {0}, Role is: {1}",
+                user.getUsername(),
+                user.getAuthorities()
+                        .stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .collect(Collectors.joining(",")));
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    public ResponseEntity<UserResponse> findById(@PathVariable Long id) {
-        return ResponseEntity.ok(mapper.userToResponse(service.findById(id)));
+    public UserResponse findById(@PathVariable Long id) {
+        return mapper.userToResponse(service.findById(id));
     }
 
     @PostMapping("/account")
-    public ResponseEntity<UserResponse> create(@RequestBody @Valid UserRequest request, @RequestParam RoleType roleType) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public UserResponse create(@RequestBody @Valid UserRequest request, @RequestParam RoleType roleType) {
         User user = service.save(mapper.requestToUser(request), Role.fromAuthority(roleType));
-        return ResponseEntity.status(HttpStatus.CREATED).body(mapper.userToResponse(user));
+        return mapper.userToResponse(user);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    public ResponseEntity<UserResponse> update(@PathVariable Long id, @RequestBody @Valid UserRequest request) {
+    public UserResponse update(@PathVariable Long id, @RequestBody @Valid UserRequest request) {
         User updated = service.update(mapper.requestToUser(id, request));
-        return ResponseEntity.ok(mapper.userToResponse(updated));
+        return mapper.userToResponse(updated);
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id) {
         service.delete(id);
-        return ResponseEntity.noContent().build();
     }
 }
