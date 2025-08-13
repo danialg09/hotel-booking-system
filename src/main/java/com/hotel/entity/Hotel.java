@@ -24,7 +24,7 @@ public class Hotel {
     private String city;
     private String address;
     private Long distance;
-    private int rating;
+    private double rating;
     private int reviews;
 
     @OneToMany(mappedBy = "hotel" , cascade = CascadeType.ALL, fetch = FetchType.EAGER)

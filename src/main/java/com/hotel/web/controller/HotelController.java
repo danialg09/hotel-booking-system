@@ -6,6 +6,8 @@ import com.hotel.service.HotelService;
 import com.hotel.web.dto.hotel.HotelRequest;
 import com.hotel.web.dto.hotel.HotelResponse;
 import com.hotel.web.dto.hotel.ListHotelResponse;
+import com.hotel.web.dto.hotel.RatingDTO;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,6 +31,11 @@ public class HotelController {
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public HotelResponse getHotelById(@PathVariable Long id) {
         return mapper.hotelToResponse(service.findById(id));
+    }
+
+    @PostMapping("/review/{id}")
+    public HotelResponse reviewHotel(@PathVariable Long id, @Valid @RequestBody RatingDTO rating) {
+        return mapper.hotelToResponse(service.reviewHotel(id, rating.getRating()));
     }
 
     @PostMapping()
