@@ -39,4 +39,11 @@ public class Room {
     @ManyToOne
     @JoinColumn(name = "hotel_id", nullable = false)
     private Hotel hotel;
+
+    public void blockDates(LocalDate checkIn, LocalDate checkOut) {
+        while (!checkIn.isAfter(checkOut)) {
+            dates.add(checkIn);
+            checkIn = checkIn.plusDays(1);
+        }
+    }
 }
