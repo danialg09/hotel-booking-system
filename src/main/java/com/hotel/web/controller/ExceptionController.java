@@ -5,6 +5,7 @@ import com.hotel.exception.EntityNotFoundException;
 import com.hotel.web.dto.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -24,6 +25,14 @@ public class ExceptionController {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(BookingAlreadyExistsException.class)
     public ErrorResponse bookingError(BookingAlreadyExistsException e) {
+        log.error(e.getLocalizedMessage());
+
+        return new ErrorResponse(e.getLocalizedMessage());
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(BookingAlreadyExistsException.class)
+    public ErrorResponse validationException(MethodArgumentNotValidException e) {
         log.error(e.getLocalizedMessage());
 
         return new ErrorResponse(e.getLocalizedMessage());
