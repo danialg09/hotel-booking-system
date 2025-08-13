@@ -3,17 +3,28 @@ package com.hotel.service.impl;
 import com.hotel.entity.Room;
 import com.hotel.exception.EntityNotFoundException;
 import com.hotel.repository.RoomRepository;
+import com.hotel.repository.RoomSpecification;
 import com.hotel.service.RoomService;
 import com.hotel.utils.BeanUtils;
+import com.hotel.web.dto.room.RoomFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class RoomServiceImpl implements RoomService {
 
     private final RoomRepository repository;
+
+    @Override
+    public List<Room> filterBy(RoomFilter filter) {
+        return repository.findAll(RoomSpecification.withFilter(filter),
+                PageRequest.of(filter.getPageNumber(), filter.getPageSize())).getContent();
+    }
 
     @Override
     public Room findById(Long id) {
