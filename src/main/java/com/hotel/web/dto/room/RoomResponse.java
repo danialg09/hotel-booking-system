@@ -22,7 +22,7 @@ public class RoomResponse {
 
     private Long price;
 
-    private int capacity;
+    private Integer capacity;
 
     private List<LocalDate> dates;
 

@@ -28,7 +28,7 @@ public class Room {
 
     private Long price;
 
-    private int capacity;
+    private Integer capacity;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "room_unavailable_dates", joinColumns = @JoinColumn(name = "room_id"))
