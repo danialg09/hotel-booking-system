@@ -18,6 +18,27 @@ public class HotelServiceImpl implements HotelService {
     private final HotelRepository repository;
 
     @Override
+    @Transactional
+    public Hotel reviewHotel(Long id, Integer rating) {
+        Hotel hotel = repository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException("Hotel not found with id: " + id));
+
+        double currentRating = hotel.getRating();
+        int reviewsCount = hotel.getReviews();
+
+        if (reviewsCount == 0) currentRating = rating;
+        else {
+            double totalRating = currentRating * reviewsCount;
+            totalRating = totalRating - currentRating + rating;
+            currentRating = Math.round((totalRating / reviewsCount) * 10.0) / 10.0;
+        }
+
+        hotel.setRating(currentRating);
+        hotel.setReviews(reviewsCount + 1);
+        return repository.save(hotel);
+    }
+
+    @Override
     public List<Hotel> findAll() {
         return repository.findAll();
     }
