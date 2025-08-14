@@ -3,9 +3,13 @@ package com.hotel.service.impl;
 import com.hotel.entity.Hotel;
 import com.hotel.exception.EntityNotFoundException;
 import com.hotel.repository.HotelRepository;
+import com.hotel.repository.HotelSpecification;
 import com.hotel.service.HotelService;
 import com.hotel.utils.BeanUtils;
+import com.hotel.web.dto.hotel.HotelFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +40,13 @@ public class HotelServiceImpl implements HotelService {
         hotel.setRating(currentRating);
         hotel.setReviews(reviewsCount + 1);
         return repository.save(hotel);
+    }
+
+    @Override
+    public Page<Hotel> filterBy(HotelFilter filter) {
+        return repository.findAll(
+                HotelSpecification.withFilter(filter),
+                PageRequest.of(filter.getPageNumber(), filter.getPageSize()));
     }
 
     @Override

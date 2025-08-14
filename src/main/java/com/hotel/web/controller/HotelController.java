@@ -3,10 +3,7 @@ package com.hotel.web.controller;
 import com.hotel.entity.Hotel;
 import com.hotel.mapper.HotelMapper;
 import com.hotel.service.HotelService;
-import com.hotel.web.dto.hotel.HotelRequest;
-import com.hotel.web.dto.hotel.HotelResponse;
-import com.hotel.web.dto.hotel.ListHotelResponse;
-import com.hotel.web.dto.hotel.RatingDTO;
+import com.hotel.web.dto.hotel.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,6 +22,12 @@ public class HotelController {
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ListHotelResponse getAllHotels() {
         return mapper.hotelsListToHotelsListResponse(service.findAll());
+    }
+
+    @GetMapping("/filter")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    public PageHotelResponse filterBy(@Valid @RequestBody HotelFilter filter) {
+        return mapper.pageHotelToPageHotelResponse(service.filterBy(filter));
     }
 
     @GetMapping("/{id}")
