@@ -2,13 +2,11 @@ package com.hotel.mapper;
 
 import com.hotel.entity.Hotel;
 import com.hotel.mapper.deckorator.HotelMapperDecorator;
-import com.hotel.web.dto.hotel.HotelRequest;
-import com.hotel.web.dto.hotel.HotelResponse;
-import com.hotel.web.dto.hotel.HotelShortResponse;
-import com.hotel.web.dto.hotel.ListHotelResponse;
+import com.hotel.web.dto.hotel.*;
 import org.mapstruct.DecoratedWith;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -23,6 +21,8 @@ public interface HotelMapper {
     HotelResponse hotelToResponse(Hotel hotel);
 
     HotelShortResponse hotelToShortResponse(Hotel hotel);
+
+    PageHotelResponse pageHotelToPageHotelResponse(Page<Hotel> hotel);
 
     List<HotelResponse> hotelsListToResponseList(List<Hotel> hotels);
 
