@@ -1,4 +1,4 @@
-package com.hotel.web.dto.hotel;
+package com.hotel.web.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +11,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PageHotelResponse {
-    private List<HotelResponse> hotels;
+public class PageResponse<T> {
+    private List<T> data;
     private Long totalPages;
 }

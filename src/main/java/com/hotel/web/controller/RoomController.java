@@ -3,10 +3,8 @@ package com.hotel.web.controller;
 import com.hotel.entity.Room;
 import com.hotel.mapper.RoomMapper;
 import com.hotel.service.RoomService;
-import com.hotel.web.dto.room.ListRoomResponse;
-import com.hotel.web.dto.room.RoomFilter;
-import com.hotel.web.dto.room.RoomRequest;
-import com.hotel.web.dto.room.RoomResponse;
+import com.hotel.web.dto.PageResponse;
+import com.hotel.web.dto.room.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -29,8 +27,8 @@ public class RoomController {
 
     @GetMapping("/filter")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    public ListRoomResponse filterBy(@Valid @RequestBody RoomFilter filter) {
-        return mapper.roomsToListResponse(service.filterBy(filter));
+    public PageResponse<RoomResponse> filterBy(@Valid @RequestBody RoomFilter filter) {
+        return mapper.pageRoomToPageResponse(service.filterBy(filter));
     }
 
     @PostMapping()

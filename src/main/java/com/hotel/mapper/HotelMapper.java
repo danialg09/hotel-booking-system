@@ -2,6 +2,7 @@ package com.hotel.mapper;
 
 import com.hotel.entity.Hotel;
 import com.hotel.mapper.deckorator.HotelMapperDecorator;
+import com.hotel.web.dto.PageResponse;
 import com.hotel.web.dto.hotel.*;
 import org.mapstruct.DecoratedWith;
 import org.mapstruct.Mapper;
@@ -22,7 +23,7 @@ public interface HotelMapper {
 
     HotelShortResponse hotelToShortResponse(Hotel hotel);
 
-    PageHotelResponse pageHotelToPageHotelResponse(Page<Hotel> hotel);
+    PageResponse<HotelResponse> pageHotelToPageResponse(Page<Hotel> hotel);
 
     List<HotelResponse> hotelsListToResponseList(List<Hotel> hotels);
 

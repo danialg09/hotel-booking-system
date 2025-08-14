@@ -3,6 +3,7 @@ package com.hotel.web.controller;
 import com.hotel.entity.Hotel;
 import com.hotel.mapper.HotelMapper;
 import com.hotel.service.HotelService;
+import com.hotel.web.dto.PageResponse;
 import com.hotel.web.dto.hotel.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,8 +27,8 @@ public class HotelController {
 
     @GetMapping("/filter")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    public PageHotelResponse filterBy(@Valid @RequestBody HotelFilter filter) {
-        return mapper.pageHotelToPageHotelResponse(service.filterBy(filter));
+    public PageResponse<HotelResponse> filterBy(@Valid @RequestBody HotelFilter filter) {
+        return mapper.pageHotelToPageResponse(service.filterBy(filter));
     }
 
     @GetMapping("/{id}")

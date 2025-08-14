@@ -2,8 +2,9 @@ package com.hotel.mapper.deckorator;
 
 import com.hotel.entity.Hotel;
 import com.hotel.mapper.HotelMapper;
+import com.hotel.web.dto.PageResponse;
 import com.hotel.web.dto.hotel.HotelRequest;
-import com.hotel.web.dto.hotel.PageHotelResponse;
+import com.hotel.web.dto.hotel.HotelResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
@@ -31,8 +32,8 @@ public abstract class HotelMapperDecorator implements HotelMapper {
     }
 
     @Override
-    public PageHotelResponse pageHotelToPageHotelResponse(Page<Hotel> hotel) {
-        return new PageHotelResponse(
+    public PageResponse<HotelResponse> pageHotelToPageResponse(Page<Hotel> hotel) {
+        return new PageResponse<>(
                 hotelsListToResponseList(hotel.getContent()), hotel.getTotalElements());
     }
 }

@@ -1,4 +1,4 @@
-package com.hotel.repository;
+package com.hotel.specification;
 
 import com.hotel.entity.Room;
 import com.hotel.web.dto.room.RoomFilter;

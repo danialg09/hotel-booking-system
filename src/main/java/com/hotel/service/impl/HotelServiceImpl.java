@@ -3,7 +3,7 @@ package com.hotel.service.impl;
 import com.hotel.entity.Hotel;
 import com.hotel.exception.EntityNotFoundException;
 import com.hotel.repository.HotelRepository;
-import com.hotel.repository.HotelSpecification;
+import com.hotel.specification.HotelSpecification;
 import com.hotel.service.HotelService;
 import com.hotel.utils.BeanUtils;
 import com.hotel.web.dto.hotel.HotelFilter;
