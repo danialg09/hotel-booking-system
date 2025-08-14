@@ -1,6 +1,6 @@
 package com.hotel.web.dto.booking;
 
-import com.hotel.web.dto.room.RoomResponse;
+import com.hotel.web.dto.room.RoomShortResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,5 +16,5 @@ public class BookingResponse {
     private Long id;
     private LocalDate checkIn;
     private LocalDate checkOut;
-    private RoomResponse room;
+    private RoomShortResponse room;
 }
