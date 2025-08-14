@@ -2,6 +2,7 @@ package com.hotel.service.impl;
 
 import com.hotel.entity.Booking;
 import com.hotel.entity.Room;
+import com.hotel.events.BookingEvent;
 import com.hotel.exception.BookingAlreadyExistsException;
 import com.hotel.exception.EntityNotFoundException;
 import com.hotel.repository.BookingRepository;
@@ -9,6 +10,8 @@ import com.hotel.repository.RoomRepository;
 import com.hotel.service.BookingService;
 import com.hotel.utils.BeanUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +25,10 @@ public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository repository;
     private final RoomRepository roomRepository;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
+
+    @Value("${app.kafka.statisticsTopic}")
+    private String topic;
 
     @Override
     public List<Booking> findAll() {
@@ -38,7 +45,17 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public Booking save(Booking booking) {
         checkBooking(booking);
-        return repository.save(booking);
+        Booking saved = repository.save(booking);
+        sendEvent(saved);
+        return saved;
+    }
+
+    public void sendEvent(Booking booking) {
+        BookingEvent event = new BookingEvent();
+        event.setUserId(String.valueOf(booking.getUser().getId()));
+        event.setCheckInDate(booking.getCheckIn());
+        event.setCheckOutDate(booking.getCheckOut());
+        kafkaTemplate.send(topic, event);
     }
 
     @Override

@@ -12,3 +12,14 @@ spring:
     change-log: classpath:db/changelog/db.changelog-master.xml
     enabled: false
     drop-first: true
+  kafka:
+    bootstrap-servers: localhost:9092
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: statistics_db
+app:
+  kafka:
+    statisticsTopic: "statistics"
+    kafkaMessageGroupId: "kafka-message-group-id"
