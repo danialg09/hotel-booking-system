@@ -2,11 +2,14 @@ package com.hotel.service.impl;
 
 import com.hotel.entity.Role;
 import com.hotel.entity.User;
+import com.hotel.events.UserRegistrationEvent;
 import com.hotel.exception.EntityNotFoundException;
 import com.hotel.repository.UserRepository;
 import com.hotel.service.UserService;
 import com.hotel.utils.BeanUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +24,10 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
+
+    @Value("${app.kafka.statisticsTopic}")
+    private String topic;
 
     @Override
     public List<User> findAll() {
@@ -55,7 +62,15 @@ public class UserServiceImpl implements UserService {
         user.setRoles(Collections.singletonList(role));
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         role.setUser(user);
-        return repository.save(user);
+        User saved = repository.save(user);
+        sendEvent(saved);
+        return saved;
+    }
+
+    public void sendEvent(User user) {
+        UserRegistrationEvent event = new UserRegistrationEvent();
+        event.setUserId(String.valueOf(user.getId()));
+        kafkaTemplate.send(topic, event);
     }
 
     @Override
