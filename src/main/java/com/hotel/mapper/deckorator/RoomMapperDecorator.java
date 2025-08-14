@@ -4,8 +4,11 @@ import com.hotel.entity.Hotel;
 import com.hotel.entity.Room;
 import com.hotel.mapper.RoomMapper;
 import com.hotel.service.HotelService;
+import com.hotel.web.dto.PageResponse;
 import com.hotel.web.dto.room.RoomRequest;
+import com.hotel.web.dto.room.RoomResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 
 public abstract class RoomMapperDecorator implements RoomMapper {
 
@@ -30,5 +33,11 @@ public abstract class RoomMapperDecorator implements RoomMapper {
         Room room = requestToRoom(request);
         room.setId(id);
         return room;
+    }
+
+    @Override
+    public PageResponse<RoomResponse> pageRoomToPageResponse(Page<Room> room) {
+        return new PageResponse<>(
+                roomsListToResponseList(room.getContent()), room.getTotalElements());
     }
 }

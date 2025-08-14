@@ -2,13 +2,12 @@ package com.hotel.mapper;
 
 import com.hotel.entity.Room;
 import com.hotel.mapper.deckorator.RoomMapperDecorator;
-import com.hotel.web.dto.room.ListRoomResponse;
-import com.hotel.web.dto.room.RoomRequest;
-import com.hotel.web.dto.room.RoomResponse;
-import com.hotel.web.dto.room.RoomShortResponse;
+import com.hotel.web.dto.PageResponse;
+import com.hotel.web.dto.room.*;
 import org.mapstruct.DecoratedWith;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -25,11 +24,7 @@ public interface RoomMapper {
 
     RoomResponse roomToResponse(Room room);
 
-    List<RoomResponse> roomsToResponses(List<Room> rooms);
+    PageResponse<RoomResponse> pageRoomToPageResponse(Page<Room> room);
 
-    default ListRoomResponse roomsToListResponse(List<Room> rooms) {
-        ListRoomResponse listRoomResponse = new ListRoomResponse();
-        listRoomResponse.setRooms(roomsToResponses(rooms));
-        return listRoomResponse;
-    }
+    List<RoomResponse> roomsListToResponseList(List<Room> rooms);
 }
