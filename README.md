@@ -9,7 +9,8 @@
 ## 🔍 Core Features
 
 - Hotel, Room, Booking, and User management
-- Role-based authentication (Admin/User) with **Basic Auth**
+- Role-based authentication (Admin/User) with **JWT Bearer Tokens**
+- **Refresh Token** mechanism for secure session management
 - REST API endpoints serve as CMS panel replacement
 - Kafka integration for user and booking events
 - MongoDB storage for statistics and CSV export
@@ -20,10 +21,11 @@
 
 ## ⚙️ Tech Stack
 
-- **Backend:** Java 17+, Spring Boot, Spring Data JPA, MapStruct, Validation
+- **Backend:** Java 21+, Spring Boot, Spring Data JPA, MapStruct, Validation
 - **Database:** PostgreSQL (main), MongoDB (statistics)
 - **Messaging:** Kafka
-- **Security:** Spring Security, Basic Auth
+- **Security:** Spring Security, **JWT, Refresh Tokens**
+- **Caching/Tokens:** **Redis**
 - **DevOps:** Docker, Docker Compose
 - **Utilities:** Lombok, Maven
 
@@ -31,7 +33,8 @@
 
 ## 🧩 Entities
 
-- **User, Role, RoleType** — user management and authorization
+- **User, RoleType** — user management and authorization (Roles stored using `@ElementCollection`)
+- **RefreshToken** — security entity managed by Redis
 - **Hotel, Room, Booking** — main hotel reservation entities
 - **StatisticsDocument** — for CSV export and MongoDB storage
 
@@ -39,16 +42,25 @@
 
 ## 🧾 REST API Endpoints
 
-### Users
+### Authentication
 
 | Method | URL | Description | Roles | DTO |
 |--------|-----|-------------|-------|-----|
-| GET | /api/users | Get all users | ADMIN | UserListResponse |
+| POST | /api/auth/register | Register a new user | any | RegisterRequest → LoginResponse |
+| POST | /api/auth/login | Authenticate and get JWT/Refresh Tokens | any | LoginRequest → LoginResponse |
+| POST | /api/auth/refresh-token | Renew JWT using a valid Refresh Token | any | RefreshTokenRequest → RefreshTokenResponse |
+| POST | /api/auth/logout | Invalidate Refresh Token and log out | ADMIN, USER | — |
+
+### Users
+
+| Method | URL                | Description | Roles | DTO |
+|--------|--------------------|-------------|-------|-----|
+| GET | /api/users         | Get all users | ADMIN | UserListResponse |
 | GET | /api/users/profile | Get current user profile | ADMIN, USER | String |
-| GET | /api/users/{id} | Get user by ID | ADMIN, USER | UserResponse |
-| POST | /api/users/account | Create a user | any | UserRequest → UserResponse |
-| PUT | /api/users/{id} | Update user | ADMIN, USER | UserRequest → UserResponse |
-| DELETE | /api/users/{id} | Delete user | ADMIN, USER | — |
+| GET | /api/users/{id}    | Get user by ID | ADMIN, USER | UserResponse |
+| POST | /api/users/create  | Create a user | any | UserRequest → UserResponse |
+| PUT | /api/users/{id}    | Update user | ADMIN, USER | UserRequest → UserResponse |
+| DELETE | /api/users/{id}    | Delete user | ADMIN, USER | — |
 
 ### Hotels
 
@@ -89,19 +101,19 @@
 
 ## 📦 Project Structure
 
-- **Controllers** — REST controllers for API endpoints
-- **DTO** — Request and Response classes (User, Hotel, Room, Booking, Statistics, Errors)
-- **Services** — business logic and event handling
+- **Controllers** — REST controllers for API endpoints, including the new `AuthController`.
+- **DTO** — Request and Response classes (User, Hotel, Room, Booking, Statistics, Errors, **Auth**)
+- **Services** — business logic and event handling, including `AuthService` and `RefreshTokenService`.
 - **Mappers** — MapStruct mappers for DTO conversion
-- **Repositories** — Spring Data JPA / Mongo repositories
-- **Security** — Authentication and role-based access
+- **Repositories** — Spring Data JPA / Mongo / **Redis** repositories
+- **Security** — Authentication, JWT components, and role-based access
 - **Kafka** — Producers and consumers for User and Booking events
 
 ---
 
 ## ⚙️ Configuration
 
-Application uses `application.yaml` for server settings, database connections, Kafka, and CSV export.
+Application uses `application.yaml` for server settings, database connections, Kafka, and security parameters.
 
 ### Example `application.yaml`:
 
@@ -118,22 +130,36 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: false
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: statistics_db
+    redis: # <-- NEW
+      host: localhost # <-- NEW
+      port: 6379 # <-- NEW
 
 kafka:
   bootstrap-servers: localhost:9092
-  user-topic: user-events
-  booking-topic: booking-events
 
-mongodb:
-  uri: mongodb://localhost:27017/statistics
+app:
+  kafka:
+    statisticsTopic: "statistics"
+    kafkaMessageGroupId: "kafka-message-group-id"
+  jwt:
+    secret: "yourSecretKey" # <-- NEW
+    tokenExpiration: 12h # <-- NEW
+    refreshTokenExpiration: 24h # <-- NEW
 ```
 ## ⚙️ Key Parameters
 
 - **server.port** — port for the application
-- **spring.datasource.\*** — PostgreSQL connection settings
+- **spring.datasource.** — PostgreSQL connection settings
 - **spring.jpa.hibernate.ddl-auto** — database schema management
-- **kafka.\*** — Kafka topics and bootstrap server
+- **kafka.** — Kafka topics and bootstrap server
 - **mongodb.uri** — MongoDB connection for statistics
+- **redis.** — Redis connection for Refresh Tokens
+- **app.jwt.** — JWT secret and token expiration times
 
 ---
 
@@ -141,11 +167,12 @@ mongodb:
 
 ### Requirements
 
-- Java 17+
+- Java 21+
 - Maven
 - PostgreSQL
 - MongoDB
 - Kafka
+- Redis
 - Docker & Docker Compose (optional)
 
 ### Steps
@@ -158,7 +185,11 @@ cd <PROJECT_FOLDER>
 ```
 ### Configure PostgreSQL, MongoDB, and Kafka
 
-Edit the `application.yaml` file to set up connections for PostgreSQL, MongoDB, and Kafka according to your environment.
+```bash
+cd docker
+docker compose up
+cd ..
+```
 
 ---
 
@@ -177,6 +208,7 @@ The API will be available at:
 
 ### ⚡ Notes
 
+- Authentication is now done by sending a JWT Bearer Token in the Authorization header.
 - All requests/responses use **DTOs**
 - Kafka streams **UserRegistrationEvent** and **BookingEvent**
 - Statistics stored in MongoDB can be exported via **CSV endpoint**
