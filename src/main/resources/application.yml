@@ -19,7 +19,14 @@ spring:
       host: localhost
       port: 27017
       database: statistics_db
+    redis:
+      host: localhost
+      port: 6379
 app:
   kafka:
     statisticsTopic: "statistics"
     kafkaMessageGroupId: "kafka-message-group-id"
+  jwt:
+    secret: "3cfa76ef14937c7c0facbbdc7b69273aе8b1b59c9d52d9646c2438577884297123984719283748237498273498273492"
+    tokenExpiration: 12h
+    refreshTokenExpiration: 24h

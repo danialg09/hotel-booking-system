@@ -1,6 +1,6 @@
 package com.hotel.service.impl;
 
-import com.hotel.entity.Role;
+import com.hotel.entity.RoleType;
 import com.hotel.entity.User;
 import com.hotel.events.UserRegistrationEvent;
 import com.hotel.exception.EntityNotFoundException;
@@ -57,11 +57,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User save(User user, Role role) {
+    @Transactional
+    public User save(User user, RoleType role) {
         user = repository.save(user);
-        user.setRoles(Collections.singletonList(role));
+        user.setRoles(Collections.singleton(role));
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        role.setUser(user);
         User saved = repository.save(user);
         sendEvent(saved);
         return saved;
