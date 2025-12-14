@@ -1,10 +1,9 @@
 package com.hotel.web.controller;
 
-import com.hotel.entity.Role;
 import com.hotel.entity.RoleType;
 import com.hotel.entity.User;
 import com.hotel.mapper.UserMapper;
-import com.hotel.security.AppUserPrincipal;
+import com.hotel.security.AppUserDetails;
 import com.hotel.service.UserService;
 import com.hotel.web.dto.user.UserListResponse;
 import com.hotel.web.dto.user.UserRequest;
@@ -35,7 +34,7 @@ public class UserController {
 
     @GetMapping("/profile")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    public String profile(@AuthenticationPrincipal AppUserPrincipal user) {
+    public String profile(@AuthenticationPrincipal AppUserDetails user) {
         return MessageFormat.format("Method called by user: {0}, Role is: {1}",
                 user.getUsername(),
                 user.getAuthorities()
@@ -50,10 +49,11 @@ public class UserController {
         return mapper.userToResponse(service.findById(id));
     }
 
-    @PostMapping("/account")
+    @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ADMIN')")
     public UserResponse create(@RequestBody @Valid UserRequest request, @RequestParam RoleType roleType) {
-        User user = service.save(mapper.requestToUser(request), Role.fromAuthority(roleType));
+        User user = service.save(mapper.requestToUser(request), roleType);
         return mapper.userToResponse(user);
     }
 

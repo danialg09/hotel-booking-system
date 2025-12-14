@@ -2,7 +2,7 @@ package com.hotel.web.controller;
 
 import com.hotel.entity.Booking;
 import com.hotel.mapper.BookingMapper;
-import com.hotel.security.AppUserPrincipal;
+import com.hotel.security.AppUserDetails;
 import com.hotel.service.BookingService;
 import com.hotel.web.dto.booking.BookingRequest;
 import com.hotel.web.dto.booking.BookingResponse;
@@ -24,7 +24,7 @@ public class BookingController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    public BookingResponse create(@AuthenticationPrincipal AppUserPrincipal user, @RequestBody BookingRequest request) {
+    public BookingResponse create(@AuthenticationPrincipal AppUserDetails user, @RequestBody BookingRequest request) {
         Booking booking = service.save(mapper.requestToBooking(request, user.getId()));
         return mapper.bookingToBookingResponse(booking);
     }

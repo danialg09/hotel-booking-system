@@ -1,21 +1,23 @@
 package com.hotel.security;
 
-import com.hotel.entity.Role;
 import com.hotel.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 
 @RequiredArgsConstructor
-public class AppUserPrincipal implements UserDetails {
+public class AppUserDetails implements UserDetails {
 
     private final User user;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return user.getRoles().stream().map(Role::toAuthority).toList();
+        return user.getRoles().stream()
+                .map(roleType -> new SimpleGrantedAuthority(roleType.name()))
+                .toList();
     }
 
     @Override
@@ -25,6 +27,10 @@ public class AppUserPrincipal implements UserDetails {
 
     public Long getId() {
         return user.getId();
+    }
+
+    public String getEmail() {
+        return user.getEmail();
     }
 
     @Override
