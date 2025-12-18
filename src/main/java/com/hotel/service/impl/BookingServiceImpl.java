@@ -3,7 +3,7 @@ package com.hotel.service.impl;
 import com.hotel.entity.Booking;
 import com.hotel.entity.Room;
 import com.hotel.events.BookingEvent;
-import com.hotel.exception.BookingAlreadyExistsException;
+import com.hotel.exception.AlreadyExistsException;
 import com.hotel.exception.EntityNotFoundException;
 import com.hotel.repository.BookingRepository;
 import com.hotel.repository.RoomRepository;
@@ -88,7 +88,7 @@ public class BookingServiceImpl implements BookingService {
             String periods = conflicts.stream()
                     .map(b -> "[" + b.getCheckIn() + " - " + b.getCheckOut() + "]")
                     .collect(Collectors.joining(", "));
-            throw new BookingAlreadyExistsException("Room already booked for the following periods: " + periods);
+            throw new AlreadyExistsException("Room already booked for the following periods: " + periods);
         }
         room.blockDates(in, out);
         roomRepository.save(room);
