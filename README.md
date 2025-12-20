@@ -22,12 +22,13 @@
 ## ⚙️ Tech Stack
 
 - **Backend:** Java 21+, Spring Boot, Spring Data JPA, MapStruct, Validation
-- **Database:** PostgreSQL (main), MongoDB (statistics)
-- **Messaging:** Kafka
-- **Security:** Spring Security, **JWT, Refresh Tokens**
-- **Caching/Tokens:** **Redis**
+- **Databases (Polyglot Persistence):** - **PostgreSQL** (Primary transactional data)
+- **MongoDB** (Analytics and Statistics)
+- **Redis** (Session management & Refresh Tokens)
+- **Migrations:** **Liquibase**
+- **Messaging:** **Kafka**
+- **Security:** Spring Security, **JWT + Refresh Tokens**
 - **DevOps:** Docker, Docker Compose
-- **Utilities:** Lombok, Maven
 
 ---
 
@@ -128,8 +129,12 @@ spring:
     password: password
   jpa:
     hibernate:
-      ddl-auto: update
-    show-sql: false
+      ddl-auto: validate # Changed to validate for production safety
+    show-sql: true
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yml
+    enabled: true
+    drop-first: true
   data:
     mongodb:
       host: localhost
@@ -206,11 +211,13 @@ The API will be available at:
 
 ---
 
-### ⚡ Notes
+### ⚡ Architectural Highlights
 
-- Authentication is now done by sending a JWT Bearer Token in the Authorization header.
-- All requests/responses use **DTOs**
-- Kafka streams **UserRegistrationEvent** and **BookingEvent**
-- Statistics stored in MongoDB can be exported via **CSV endpoint**
-- Role-based access ensures **Admin/User separation**
-- Errors return unified JSON response through **ExceptionController**  
+- **Database Schema Management** — Fully managed via **Liquibase** migrations. Direct schema updates are disabled (`ddl-auto: validate`) to ensure data integrity and version control.
+- **Event-Driven Analytics** — Key system events (User Registrations, Bookings) are streamed asynchronously via **Kafka** for decoupled statistical processing.
+- **Polyglot Persistence Strategy** — Optimal storage selection:
+- **PostgreSQL** for consistent ACID-compliant transactions.
+- **MongoDB** for flexible, high-performance analytical document storage.
+- **Redis** for lightning-fast **Refresh Token** validation and session security.
+- **API Documentation** — Comprehensive API contract provided via **Swagger/OpenAPI 3.1** with built-in JWT Authorization support for interactive testing.
+- **Unified Error Handling** — Centralized exception management using **ExceptionController** for consistent JSON error responses across the entire system.
