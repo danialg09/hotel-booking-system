@@ -104,6 +104,7 @@ public class UserServiceImpl implements UserService {
         // Обновляем данные
         user.setName(event.username());
         user.setEmail(event.email());
+        user.setPassword("EXTERNAL_SSO_USER");
 
         // Сохраняем (Spring Data JPA сам решит: сделать INSERT для нового или UPDATE для существующего)
         repository.save(user);
