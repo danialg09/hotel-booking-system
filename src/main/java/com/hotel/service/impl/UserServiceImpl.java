@@ -2,6 +2,7 @@ package com.hotel.service.impl;
 
 import com.hotel.entity.RoleType;
 import com.hotel.entity.User;
+import com.hotel.events.IncomingUserEvent;
 import com.hotel.events.UserRegistrationEvent;
 import com.hotel.exception.EntityNotFoundException;
 import com.hotel.repository.UserRepository;
@@ -87,5 +88,24 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void delete(Long id) {
         repository.deleteById(id);
+    }
+
+    @Override
+    @Transactional
+    public void syncUser(IncomingUserEvent event) {
+        // Ищем юзера. Если его нет — создаем пустую болванку с тем же ID, что и в Банке
+        User user = repository.findById(event.userId())
+                .orElseGet(() -> {
+                    User newUser = new User();
+                    newUser.setId(event.userId()); // ID должен строго совпадать с банковским!
+                    return newUser;
+                });
+
+        // Обновляем данные
+        user.setName(event.username());
+        user.setEmail(event.email());
+
+        // Сохраняем (Spring Data JPA сам решит: сделать INSERT для нового или UPDATE для существующего)
+        repository.save(user);
     }
 }
