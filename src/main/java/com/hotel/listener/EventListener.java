@@ -35,6 +35,6 @@ public class EventListener {
         log.info("User registered from Bank ID: {}, Username: {}, Email: {}",
                 event.userId(), event.username(), event.email());
 
-        //userService.upsertUser(event);
+        userService.syncUser(event);
     }
 }
