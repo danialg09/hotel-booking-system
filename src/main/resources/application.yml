@@ -25,6 +25,7 @@ spring:
 app:
   kafka:
     statisticsTopic: "statistics"
+    user-sync-topic: "bank.user.registered"
     kafkaMessageGroupId: "kafka-message-group-id"
   jwt:
     secret: "3cfa76ef14937c7c0facbbdc7b69273aе8b1b59c9d52d9646c2438577884297123984719283748237498273498273492"
