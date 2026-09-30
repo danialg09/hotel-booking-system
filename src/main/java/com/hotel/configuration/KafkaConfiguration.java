@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.*;
-import org.springframework.kafka.support.serializer.JsonDeserializer;
+import org.springframework.kafka.support.converter.StringJsonMessageConverter;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
 import java.util.HashMap;
@@ -41,25 +41,28 @@ public class KafkaConfiguration {
     }
 
     @Bean
-    public ConsumerFactory<String, Object> kafkaMessageConsumerFactory(ObjectMapper objectMapper) {
+    public ConsumerFactory<String, String> kafkaMessageConsumerFactory() {
         Map<String, Object> config = new HashMap<>();
         config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-        config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
         config.put(ConsumerConfig.GROUP_ID_CONFIG, kafkaMessageGroupId);
 
-        JsonDeserializer<Object> deserializer = new JsonDeserializer<>(objectMapper);
-        deserializer.addTrustedPackages("*");
-        deserializer.setUseTypeHeaders(false);
+        // Читаем из Кафки просто как сырые строки (String), никаких падений
+        config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
 
-        return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), deserializer);
+        return new DefaultKafkaConsumerFactory<>(config);
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaMessageConcurrentKafkaListenerContainerFactory
-            (ConsumerFactory<String, Object> kafkaMessageConsumerFactory) {
-        ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
+    public ConcurrentKafkaListenerContainerFactory<String, String> kafkaMessageConcurrentKafkaListenerContainerFactory(
+            ConsumerFactory<String, String> kafkaMessageConsumerFactory,
+            ObjectMapper objectMapper) {
+
+        ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(kafkaMessageConsumerFactory);
+
+        // Магия тут: конвертер сам прочитает сигнатуру метода (@Payload ТвойКласс) и смапит JSON в него
+        factory.setRecordMessageConverter(new StringJsonMessageConverter(objectMapper));
 
         return factory;
     }
